@@ -1,7 +1,7 @@
 from collections import Counter
 from typing import Optional
 
-from combination import COMBINATIONS, Combination
+from combination import COMBINATIONS, Combination, NoneCombination
 
 
 class Hand(object):
@@ -26,32 +26,18 @@ class Hand(object):
         self_combination = self.find_combination()
         other_combination = other.find_combination()
 
-        if self.rank(self_combination) > self.rank(other_combination):
+        if self.rank(self_combination) < self.rank(other_combination):
             return "Win"
-        elif self.rank(self_combination) < self.rank(other_combination):
+        elif self.rank(self_combination) > self.rank(other_combination):
             return "Loss"
 
-        return self_combination.compare(other_combination)
+        result = self_combination.compare(other_combination)
+        if result == 'Tie':
+            self_combination = NoneCombination().apply(self.get_cards())
+            other_combination = NoneCombination().apply(other.get_cards())
+            result = self_combination.compare(other_combination)
 
-        # if self.has_pair() or other.has_pair():
-        #     if self.has_pair() and not other.has_pair():
-        #         return "Win"
-        #     if not self.has_pair() and other.has_pair():
-        #         return "Loss"
-        #     self_value, _ = self.find_pair()
-        #     other_value, _ = other.find_most_common()
-        #     if self_value != other_value:
-        #         if self_value > other_value:
-        #             return "Win"
-        #         elif self_value < other_value:
-        #             return "Loss"
-
-        # if self_max > other_max:
-        #   return "Win"
-        # elif self_max < other_max:
-        #   return "Loss"
-        # else:
-        #   return "Tie"
+        return result
 
     def has_pair(self):
         most_common = self.find_pair()

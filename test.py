@@ -26,3 +26,9 @@ class PokerHandTest(unittest.TestCase):
         handTwo = Hand("2D 2C 9D AC 6H")
         result = handOne.compare_with(handTwo)
         self.assertEqual("Win", result)
+
+    def test_three_of_a_kind_wins_pair(self):
+        handOne = Hand("KS KH 5C JD TD")
+        handTwo = Hand("2D 2C 2H AC 6H")
+        result = handOne.compare_with(handTwo)
+        self.assertEqual("Loss", result)
