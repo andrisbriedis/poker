@@ -1,39 +1,57 @@
 from collections import Counter
+from typing import Optional
 
-class Hand:
+from combination import COMBINATIONS, Combination
+
+
+class Hand(object):
     CARD_VALUES = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 
     def __init__(self, hand: str):
-      self.__hand = hand.split(" ")
+        self.__hand = hand.split(" ")
+
+    def get_cards(self):
+        return list(self.__hand)
+
+    def find_combination(self):
+        for combination_type in COMBINATIONS:
+            combination = combination_type().apply(self.__hand)
+            if combination:
+                return combination
+
+    def rank(self, combination: Optional[Combination]) -> int:
+        return COMBINATIONS.index(combination.__class__)
 
     def compare_with(self, other):
+        self_combination = self.find_combination()
+        other_combination = other.find_combination()
 
-        self_max = self.find_max()
-        other_max = other.find_max()
+        if self.rank(self_combination) > self.rank(other_combination):
+            return "Win"
+        elif self.rank(self_combination) < self.rank(other_combination):
+            return "Loss"
 
-        if self.has_pair() or other.has_pair():
-            if self.has_pair() and not other.has_pair():
-                return "Win"
-            if not self.has_pair() and other.has_pair():
-                return "Loss"
-            self_value, _ = self.find_pair()
-            other_value, _ = other.find_pair()
-            if self_value != other_value:
-                if self_value > other_value:
-                    return "Win"
-                elif self_value < other_value:
-                    return "Loss"
+        return self_combination.compare(other_combination)
 
-        if self_max > other_max:
-          return "Win"
-        elif self_max < other_max:
-          return "Loss"
-        else:
-          return "Tie"
+        # if self.has_pair() or other.has_pair():
+        #     if self.has_pair() and not other.has_pair():
+        #         return "Win"
+        #     if not self.has_pair() and other.has_pair():
+        #         return "Loss"
+        #     self_value, _ = self.find_pair()
+        #     other_value, _ = other.find_most_common()
+        #     if self_value != other_value:
+        #         if self_value > other_value:
+        #             return "Win"
+        #         elif self_value < other_value:
+        #             return "Loss"
 
-    def find_max(self):
-        self_values = [self.CARD_VALUES.index(value[0]) for value in self.__hand]
-        return max(self_values)
+        # if self_max > other_max:
+        #   return "Win"
+        # elif self_max < other_max:
+        #   return "Loss"
+        # else:
+        #   return "Tie"
 
     def has_pair(self):
         most_common = self.find_pair()
